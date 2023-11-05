@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+let dotenv = require('dotenv').config()
 
 /**
  * Module dependencies.
@@ -11,8 +12,8 @@ var http = require('http');
 /**
  * Get port from environment and store in Express.
  */
-
 var port = normalizePort(process.env.PORT || '3000');
+console.log(`Listening on: ${process.env.URL}:${port}`);
 app.set('port', port);
 
 /**
