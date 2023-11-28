@@ -1,12 +1,12 @@
-var express = require('express');
+var express = require("express");
 var router = express.Router();
 
 /* GET home page. */
-router.get('/', function (req, res, next) {
-  res.send('respond with a resource');
+router.get("/", function (req, res, next) {
+  res.send("respond with a resource");
 });
 
-router.get('/skill', (req, res, next) => {
+router.get("/skill", (req, res, next) => {
   const SOFT_SKILLS = [
     {
       src: "/img/Diseños-16.png",
@@ -82,9 +82,9 @@ router.get('/skill', (req, res, next) => {
     programingLanguages: PROGRAMING_LANGS,
     tools: TOOLS,
   });
-})
+});
 
-router.get('/project', (req, res, next) => {
+router.get("/project", (req, res, next) => {
   const PROJECTS = [
     {
       name: "Huaro Web System",
@@ -100,10 +100,10 @@ router.get('/project', (req, res, next) => {
       categories: ["photo"],
     },
   ];
-  res.json(PROJECTS)
-})
+  res.json(PROJECTS);
+});
 
-router.get('/roles', (req, res, next) => {
+router.get("/role", (req, res, next) => {
   const ROLES = [
     { name: "All Roles", value: "all" },
     { name: "Web Developer", value: "web" },
@@ -114,7 +114,7 @@ router.get('/roles', (req, res, next) => {
     { name: "Devops", value: "devops" },
     { name: "Photography", value: "photo" },
   ];
-  res.json(ROLES)
-})
+  res.json(ROLES);
+});
 
 module.exports = router;
