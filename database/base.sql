@@ -1,3 +1,10 @@
+
+-- Table for skill types
+CREATE TABLE skill_types (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    type_name VARCHAR(50) NOT NULL
+);
+
 -- Table for generic skills
 CREATE TABLE generic_skills (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -8,11 +15,6 @@ CREATE TABLE generic_skills (
     FOREIGN KEY (type_id) REFERENCES skill_types(id)
 );
 
--- Table for skill types
-CREATE TABLE skill_types (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    type_name VARCHAR(50) NOT NULL
-);
 
 -- Table for projects
 CREATE TABLE projects (

@@ -1,12 +1,29 @@
-var express = require("express");
-var router = express.Router();
+const express = require("express");
+const router = express.Router();
+const db = require('../database/db');
+
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
   res.send("respond with a resource");
 });
 
-router.get("/skill", (req, res, next) => {
+// Health Check Endpoint
+router.get('/health', async (req, res) => {
+  try {
+    // Check the database connection
+    await db.query('SELECT 1');
+
+    res.json({ status: 'ok' });
+  } catch (error) {
+    console.error('Health check failed:', error);
+    res.status(500).json({ status: 'error', message: 'Health check failed' });
+  }
+});
+
+router.get("/skill", async (req, res, next) => {
+  const results = await db.query("SELECT * FROM generic_skills");
+  console.log(results);
   const SOFT_SKILLS = [
     {
       src: "/img/Diseños-16.png",
@@ -158,5 +175,16 @@ router.get("/role", (req, res, next) => {
   ];
   res.json(ROLES);
 });
+
+// Continuous Database Health Check
+const healthCheckInterval = 60000; // 1 minute interval
+setInterval(async () => {
+  try {
+    await db.query('SELECT 1');
+    console.log('Database health check passed.');
+  } catch (error) {
+    console.error('Database health check failed:', error);
+  }
+}, healthCheckInterval);
 
 module.exports = router;
