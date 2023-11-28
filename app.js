@@ -12,6 +12,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-app.use('/', indexRouter);
+app.use('/api/', indexRouter);
 
 module.exports = app;
