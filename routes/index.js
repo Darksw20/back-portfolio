@@ -22,83 +22,57 @@ router.get('/health', async (req, res) => {
 });
 
 router.get("/skill", async (req, res, next) => {
-  const results = await db.query("SELECT * FROM generic_skills");
-  console.log(results);
-  const SOFT_SKILLS = [
-    {
-      src: "/img/Diseños-16.png",
-      name: "Teamwork",
-    },
-    {
-      src: "/img/Diseños-17.png",
-      name: "Leadership",
-    },
-    {
-      src: "/img/Diseños-18.png",
-      name: "Problem Solving",
-    },
-    {
-      src: "/img/Diseños-19.png",
-      name: "Critical thinking",
-    },
-  ];
-  const COURSES = [
-    {
-      name: "Diseño de Aplicaciones Digitales",
-      place: "CETI Guadalajara, México",
-      date: "05/17",
-    },
-    {
-      name: "Diseño de Productos Digitales",
-      place: "CETI Guadalajara, México",
-      date: "09/17",
-    },
-  ];
-  const LANGS = [
-    {
-      name: "Español",
-      percentage: 100,
-    },
-    {
-      name: "Ingles",
-      percentage: 80,
-    },
-  ];
-  const PROGRAMING_LANGS = [
-    {
-      name: "JAVA",
-      percentage: 100,
-    },
-    {
-      name: "C/C++",
-      percentage: 100,
-    },
-    {
-      name: "PHP",
-      percentage: 100,
-    },
-    {
-      name: "HTML/CSS",
-      percentage: 100,
-    },
-  ];
-  const TOOLS = [
-    {
-      name: "Git",
-      percentage: 100,
-    },
-    {
-      name: "Illustrator",
-      percentage: 100,
-    },
-  ];
-  res.json({
-    softSkill: SOFT_SKILLS,
-    courses: COURSES,
-    languages: LANGS,
-    programingLanguages: PROGRAMING_LANGS,
-    tools: TOOLS,
-  });
+  try {
+    const query = `
+      SELECT gs.name, gs.src, gs.percentage, st.type_name
+      FROM generic_skills gs
+      INNER JOIN skill_types st ON gs.type_id = st.id
+    `;
+
+    const results = await db.query(query);
+
+    const skills = {
+      softSkill: [],
+      courses: [],
+      languages: [],
+      programingLanguages: [],
+      tools: [],
+    };
+
+    results.forEach((row) => {
+      const skill = {
+        name: row.name,
+        src: row.src,
+        percentage: row.percentage,
+      };
+
+      switch (row.type_name) {
+        case 'soft':
+          skills.softSkill.push(skill);
+          break;
+        case 'course':
+          skills.courses.push(skill);
+          break;
+        case 'language':
+          skills.languages.push(skill);
+          break;
+        case 'programming':
+          skills.programingLanguages.push(skill);
+          break;
+        case 'tool':
+          skills.tools.push(skill);
+          break;
+        default:
+          // Handle any other skill types as needed
+          break;
+      }
+    });
+
+    res.json(skills);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 
 router.get("/project", async (req, res, next) => {
