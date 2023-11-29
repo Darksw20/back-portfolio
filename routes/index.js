@@ -101,79 +101,24 @@ router.get("/skill", async (req, res, next) => {
   });
 });
 
-router.get("/project", (req, res, next) => {
-  const PROJECTS = [
-    {
-      name: "Huaro Web System",
-      src: "/img/Huaro.JPG",
-      date: "08-17",
-      description:
-        "Web system for organizers to automate scoring process in sports championship.",
-      roles: ["web", "mobile", "uiux", "pm"],
-    },
-    {
-      name: "Port1",
-      src: "/img/HuaroM.png",
-      date: "08-17",
-      description: "Lorem ipsum, dolor sit amet consectetur adipisicing.",
-      roles: ["photo"],
-    },
-    {
-      name: "Port1",
-      src: "/img/HuaroM.png",
-      date: "08-17",
-      description:
-        "Attended the fourth Campus Party in Guadalajara and worked as Game Designer and programmer in a project to create a game about the experience of beign in the event.",
-      roles: ["photo"],
-    },
-    {
-      name: "Port1",
-      src: "/img/HuaroM.png",
-      date: "08-17",
-      description:
-        "Developed an App to automate the scoring process at an annual private sports championship (Huaro) with an attendance of about 500 people; making results more reliable to the atendees.",
-      roles: ["photo"],
-    },
-    {
-      name: "Port1",
-      src: "/img/HuaroM.png",
-      date: "08-17",
-      description:
-        "Participated on the team that developed 100 laterns made of recyclable materials to be sent to the victims of the 19/09 earthquake in Mexico.",
-      roles: ["photo"],
-    },
-    {
-      name: "Port1",
-      src: "/img/HuaroM.png",
-      date: "08-17",
-      description:
-        "Developed an App to maintain control on the registration process of a national event for the ASMAC (Asociacion de Scouts de Mexico A.C.), with more than 10,000 participants; improving 250 times the speed of such process.",
-      roles: ["photo"],
-    },
-    {
-      name: "Port1",
-      src: "/img/HuaroM.png",
-      date: "08-17",
-      description:
-        "Within the frame of the Distributed Systems className, worked as a project manager of the team responsible of developing an Ecommerce.",
-      roles: ["photo"],
-    },
-  ];
-  res.json(PROJECTS);
+router.get("/project", async (req, res, next) => {
+  const results = await db.query("SELECT p.name AS project_name, p.src AS project_src, p.date AS project_date, p.description AS project_description, GROUP_CONCAT(r.value) AS roles FROM projects p JOIN project_roles pr ON p.id = pr.project_id JOIN roles r ON pr.role_id = r.id GROUP BY p.id;");
+  const parsedResults = results.map(result => {
+    return {
+      name: result.project_name,
+      src: result.project_src,
+      date: result.project_date,
+      description: result.project_description,
+      roles: result.roles ? result.roles.split(',') : [] // Split roles into an array
+    };
+  });
+  console.log(results);
+  res.json(parsedResults);
 });
 
-router.get("/role", (req, res, next) => {
-  const ROLES = [
-    { name: "All Roles", value: "all" },
-    { name: "Web Developer", value: "web" },
-    { name: "Mobile Developer", value: "mobile" },
-    { name: "UX/UI Designer", value: "uiux" },
-    { name: "Project Manager", value: "pm" },
-    { name: "Game Developer", value: "games" },
-    { name: "Devops", value: "devops" },
-    { name: "Photography", value: "photo" },
-  ];
-  res.json(ROLES);
+router.get("/role", async (req, res, next) => {
+  const results = await db.query("SELECT name,value FROM roles");
+  res.json(results);
 });
 
 // Continuous Database Health Check
