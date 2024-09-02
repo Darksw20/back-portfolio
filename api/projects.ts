@@ -6,10 +6,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 	if (req.method === "GET") {
 		try {
 			const result = await sql`SELECT * FROM achievements;`;
-			return res.status(200).json({
-				message: `GET Hello ${name}!`,
-				result: result,
-			});
+			return res.status(200).json(result.rows);
 		} catch (error) {
 			return res.status(500).json({
 				message: error,
