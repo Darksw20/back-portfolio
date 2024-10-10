@@ -1,6 +1,7 @@
 CREATE TABLE users (
     id serial PRIMARY KEY,
     email varchar(255),
+    username varchar(20),
     password varchar(255)
 );
 
@@ -8,7 +9,11 @@ CREATE TABLE contacts (
     id serial PRIMARY KEY,
     name varchar(255),
     email varchar(255),
-    message varchar(255)
+    message varchar(255),
+    user_id integer,
+    CONSTRAINT contacts_user_id
+        FOREIGN KEY(user_id)
+            REFERENCES users(id)
 );
 
 CREATE TABLE achievements (
@@ -19,7 +24,11 @@ CREATE TABLE achievements (
     url varchar(255),
     start_date date,
     end_date date,
-    type varchar(255)
+    type varchar(255),
+    user_id integer,
+    CONSTRAINT achivement_user_id
+        FOREIGN KEY(user_id)
+            REFERENCES users(id)
 );
 
 CREATE TABLE skills (
