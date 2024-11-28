@@ -14,32 +14,37 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 		"Authorization,X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version"
 	);
 
-	const { username, password, email } = req.body as {
-		username?: string;
-		password?: string;
-		email?: string;
-	};
-
 	if (req.method === "GET") {
 		// Handle GET requests
 		return res.json({
 			message: `GET Hello!`,
 		});
 	} else if (req.method === "POST") {
+		// Parse JSON body
+		let body;
 		try {
-			// Properly parameterize the query
-
-			const result =
-				await sql`INSERT INTO users (email, username, password) VALUES (${email}, ${username}, ${password});`;
-
-			console.log("result", result);
-
-			return res.status(200).json({ message: "Registred" });
+			body = JSON.parse(req.body || "{}");
 		} catch (error) {
-			console.log("error", error);
-			return res.status(500).json({
-				message: error.message || "Internal Server Error",
-			});
+			return res.status(400).json({ message: "Invalid JSON body" });
+		}
+
+		const { username, email, password } = body;
+
+		if (!username || !email || !password) {
+			return res.status(400).json({ message: "Missing required fields" });
+		}
+
+		try {
+			const result = await sql`
+				 INSERT INTO users (username, email, password)
+				 VALUES (${username}, ${email}, ${password})
+				 RETURNING id;
+			 `;
+
+			return res.status(201).json({ userId: result.rows[0].id });
+		} catch (error) {
+			console.error("Database error:", error);
+			return res.status(500).json({ message: "Internal Server Error" });
 		}
 	} else {
 		// Handle any other HTTP method
