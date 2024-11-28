@@ -20,15 +20,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 			message: `GET Hello!`,
 		});
 	} else if (req.method === "POST") {
-		// Parse JSON body
-		let body;
-		try {
-			body = JSON.parse(req.body || "{}");
-		} catch (error) {
-			return res.status(400).json({ message: "Invalid JSON body" });
-		}
+		const { username, email, password } = req.body;
 
-		const { username, email, password } = body;
+		console.log("username", username);
+		console.log("email", email);
+		console.log("password", password);
 
 		if (!username || !email || !password) {
 			return res.status(400).json({ message: "Missing required fields" });
