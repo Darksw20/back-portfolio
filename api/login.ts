@@ -2,11 +2,10 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { sql } from "@vercel/postgres";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-	console.log("req.method", req.method);
-	console.log("req.body", req.body);
-	console.log("req.query", req.query);
-	console.log("req.headers", req.headers);
-	console.log("req.cookies", req.cookies);
+	// Set CORS headers
+	res.setHeader("Access-Control-Allow-Origin", "*");
+	res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+	res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
 	const { username, password } = req.body as {
 		username?: string;
