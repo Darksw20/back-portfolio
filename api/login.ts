@@ -9,7 +9,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 	if (req.method === "GET") {
 		// Process a POST request
 		return res.json({
-			message: `GET Hello ${name}!`,
+			message: `GET Hello !`,
 		});
 	} else if (req.method === "POST") {
 		try {
@@ -29,7 +29,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 	} else {
 		// Handle any other HTTP method
 		return res.json({
-			message: `Other Hello ${name}!`,
+			message: `Other Hello !`,
 		});
 	}
 }
