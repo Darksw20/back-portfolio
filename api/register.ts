@@ -7,7 +7,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 	res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
 	res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
-	const { username, password } = req.body as {
+	const { username, password, email } = req.body as {
+		email?: string;
 		username?: string;
 		password?: string;
 	};
@@ -20,10 +21,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 	} else if (req.method === "POST") {
 		try {
 			// Properly parameterize the query
+
 			const result = await sql`
-				SELECT id, email 
-				FROM users 
-				WHERE username = ${username} AND password = ${password};
+				INSERT INTO users (email, username, password)
+				VALUES (${email}, ${username}, ${password})
 			`;
 
 			console.log("result", result);
