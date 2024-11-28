@@ -2,7 +2,7 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { sql } from "@vercel/postgres";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-	const { username, password } = req.query as {
+	const { username, password } = req.body as {
 		username?: string;
 		password?: string;
 	};
