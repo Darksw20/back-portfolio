@@ -2,7 +2,9 @@ CREATE TABLE users (
     id serial PRIMARY KEY,
     email varchar(255),
     username varchar(20),
-    password varchar(255)
+    password varchar(255),
+    linkedin varchar(255)
+    github varchar(255)
 );
 
 CREATE TABLE contacts (
