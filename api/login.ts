@@ -13,14 +13,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 		});
 	} else if (req.method === "POST") {
 		try {
-			const result = await sql`
+			const query = `
                 SELECT id, email
                 FROM users 
                 WHERE username = ${username} and password = ${password};
             `;
+			const result = await sql`
+                ${query}
+            `;
 
 			// return res.status(200).json(result.rows.length > 0 ? result.rows[0] : {});
-			return res.status(200).json(result.rows);
+			return res.status(200).json({
+				result: result,
+				query: query,
+			});
 		} catch (error) {
 			return res.status(500).json({
 				message: error.message || "Internal Server Error",
