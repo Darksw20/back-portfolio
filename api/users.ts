@@ -6,8 +6,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 	if (req.method === "GET") {
 		try {
 			const query = user
-				? `SELECT id,email,username,summary,motivation FROM users WHERE username='${user}';`
-				: `SELECT id,email,username,summary,motivation FROM users;`;
+				? `SELECT id,email,username,summary,motivation,github,linkedin FROM users WHERE username='${user}';`
+				: `SELECT id,email,username,summary,motivation,github,linkedin FROM users;`;
 			const result = await sql`${query}`;
 			return res.status(200).json(result.rows);
 		} catch (error) {
