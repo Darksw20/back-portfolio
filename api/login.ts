@@ -12,28 +12,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 		username?: string;
 		password?: string;
 	};
+
 	if (req.method === "GET") {
-		// Process a POST request
+		// Handle GET requests
 		return res.json({
-			message: `GET Hello !`,
+			message: `GET Hello!`,
 		});
 	} else if (req.method === "POST") {
 		try {
-			const query = `
-                SELECT id, email
-                FROM users 
-                WHERE username = ${username} and password = ${password};
-            `;
+			// Properly parameterize the query
 			const result = await sql`
-                ${query}
-            `;
+				SELECT id, email 
+				FROM users 
+				WHERE username = ${username} AND password = ${password};
+			`;
 
-			// return res.status(200).json(result.rows.length > 0 ? result.rows[0] : {});
-			return res.status(200).json({
-				result: result,
-				query: query,
-			});
+			console.log("result", result);
+
+			return res
+				.status(200)
+				.json(
+					result.rows.length > 0 ? result.rows[0] : { message: "No user found" }
+				);
 		} catch (error) {
+			console.log("error", error);
 			return res.status(500).json({
 				message: error.message || "Internal Server Error",
 			});
@@ -41,7 +43,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 	} else {
 		// Handle any other HTTP method
 		return res.json({
-			message: `Other Hello !`,
+			message: `Other Hello!`,
 		});
 	}
 }
