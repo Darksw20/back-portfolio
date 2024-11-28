@@ -3,9 +3,16 @@ import { sql } from "@vercel/postgres";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
 	// Set CORS headers
+	res.setHeader("Access-Control-Allow-Credentials", "true");
 	res.setHeader("Access-Control-Allow-Origin", "*");
-	res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-	res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+	res.setHeader(
+		"Access-Control-Allow-Methods",
+		"GET,OPTIONS,PATCH,DELETE,POST,PUT"
+	);
+	res.setHeader(
+		"Access-Control-Allow-Headers",
+		"Authorization,X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version"
+	);
 
 	const { username, password } = req.body as {
 		username?: string;
@@ -20,17 +27,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 	} else if (req.method === "POST") {
 		try {
 			// Properly parameterize the query
-			const result = await sql`
-				SELECT id, email 
-				FROM users 
-				WHERE username = ${username} AND password = ${password};
-			`;
+			const result =
+				await sql`SELECT id,email FROM users WHERE username = ${username} AND password = ${password};`;
 
 			console.log("result", result);
 
-			return res.status(200).json(
-				result.rows //.length > 0 ? result.rows[0] : { message: "No user found" }
-			);
+			return res
+				.status(200)
+				.json(
+					result.rows.length > 0 ? result.rows[0] : { message: "No user found" }
+				);
 		} catch (error) {
 			console.log("error", error);
 			return res.status(500).json({
