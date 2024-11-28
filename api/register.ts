@@ -31,6 +31,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 		}
 
 		try {
+			// Validate if the user already exists
+			const user = await sql`
+				SELECT id FROM users WHERE username = ${username};
+			`;
+
+			if (user.rows.length > 0) {
+				return res.status(400).json({ message: "Username already exists" });
+			}
+
+			// validate if the email already exists
+			const userEmail = await sql`
+				SELECT id FROM users WHERE email = ${email};
+			`;
+
+			if (userEmail.rows.length > 0) {
+				return res.status(400).json({ message: "Email already exists" });
+			}
+
 			const result = await sql`
 				 INSERT INTO users (username, email, password)
 				 VALUES (${username}, ${email}, ${password})
