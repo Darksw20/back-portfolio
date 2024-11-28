@@ -5,14 +5,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 	const { user } = req.query as { user?: string };
 	if (req.method === "GET") {
 		try {
-			const query = user
-				? `SELECT id,email,username,summary,motivation,github,linkedin FROM users WHERE username='${user}';`
-				: `SELECT id,email,username,summary,motivation,github,linkedin FROM users;`;
-			const result = await sql`${query}`;
+			let result;
+			if (user) {
+				// Use parameterized query to prevent SQL injection
+				result = await sql`
+					SELECT id, email, username, summary, motivation, github, linkedin 
+					FROM users 
+					WHERE username = ${user};
+				`;
+			} else {
+				result = await sql`
+					SELECT id, email, username, summary, motivation, github, linkedin 
+					FROM users;
+				`;
+			}
 			return res.status(200).json(result.rows);
 		} catch (error) {
 			return res.status(500).json({
-				message: error,
+				message: error.message || "Internal Server Error",
 			});
 		}
 	} else if (req.method === "POST") {

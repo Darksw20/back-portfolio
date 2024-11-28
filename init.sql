@@ -3,7 +3,9 @@ CREATE TABLE users (
     email varchar(255),
     username varchar(20),
     password varchar(255),
-    linkedin varchar(255)
+    summary varchar(255),
+    motivation varchar(255),
+    linkedin varchar(255),
     github varchar(255)
 );
 
