@@ -15,9 +15,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 	);
 
 	const { username, password, email } = req.body as {
-		email?: string;
 		username?: string;
 		password?: string;
+		email?: string;
 	};
 
 	if (req.method === "GET") {
