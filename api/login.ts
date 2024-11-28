@@ -28,11 +28,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
 			console.log("result", result);
 
-			return res
-				.status(200)
-				.json(
-					result.rows.length > 0 ? result.rows[0] : { message: "No user found" }
-				);
+			return res.status(200).json(
+				result.rows //.length > 0 ? result.rows[0] : { message: "No user found" }
+			);
 		} catch (error) {
 			console.log("error", error);
 			return res.status(500).json({
