@@ -14,6 +14,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 		"Authorization,X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version"
 	);
 
+	console.log("Request body:", req.body);
+
 	const { username, password } = req.body as {
 		username?: string;
 		password?: string;
