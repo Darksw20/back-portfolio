@@ -29,10 +29,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 			});
 		}
 	} else if (req.method === "POST") {
+		const { name, percent } = JSON.parse(req.body);
 		//Add new role
 		const insertRole = await sql`
 			INSERT INTO roles (name, percent, image)
-			VALUES (${req.body.name}, ${req.body.percent}, ${req.body.image})
+			VALUES (${name}, ${percent}, 'cuervo.jpg')
 			RETURNING *;`;
 		return res.status(200).json(insertRole.rows[0]);
 	} else {
