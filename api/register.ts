@@ -13,6 +13,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 		"Access-Control-Allow-Headers",
 		"Authorization,X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version"
 	);
+
+	if (!req.body.username || !req.body.email || !req.body.password) {
+		return res.status(400).json({ message: "Missing required fields" });
+	}
+
 	const { username, email, password } = req.body;
 
 	console.log("username", username);
@@ -25,10 +30,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 			message: `GET Hello!`,
 		});
 	} else if (req.method === "POST") {
-		if (!username || !email || !password) {
-			return res.status(400).json({ message: "Missing required fields" });
-		}
-
 		try {
 			// Validate if the user already exists
 			const user = await sql`
