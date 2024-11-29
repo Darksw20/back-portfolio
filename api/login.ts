@@ -32,7 +32,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 			const result =
 				await sql`SELECT id,email FROM users WHERE username = ${username} AND password = ${password};`;
 
-			console.log("result", result);
+			console.log(
+				"result",
+				`SELECT id,email FROM users WHERE username = ${username} AND password = ${password};`,
+				result
+			);
 
 			const userFound = result.rows.length > 0;
 
