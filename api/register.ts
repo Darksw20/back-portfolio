@@ -14,7 +14,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 		"Authorization,X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version"
 	);
 
-	if (!req.body.username || !req.body.email || !req.body.password) {
+	const { username, email, password } = JSON.parse(req.body);
+
+	if (!username || !email || !password) {
 		return res.status(400).json({ message: "Missing required fields" });
 	}
 
@@ -27,7 +29,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 		try {
 			// Validate if the user already exists
 			const user = await sql`
-				SELECT id FROM users WHERE username = ${req.body.username};
+				SELECT id FROM users WHERE username = ${username};
 			`;
 
 			if (user.rows.length > 0) {
@@ -36,7 +38,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
 			// validate if the email already exists
 			const userEmail = await sql`
-				SELECT id FROM users WHERE email = ${req.body.email};
+				SELECT id FROM users WHERE email = ${email};
 			`;
 
 			if (userEmail.rows.length > 0) {
@@ -45,7 +47,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
 			const result = await sql`
 				 INSERT INTO users (username, email, password)
-				 VALUES (${req.body.username}, ${req.body.email}, ${req.body.password})
+				 VALUES (${username}, ${email}, ${password})
 				 RETURNING id;
 			 `;
 

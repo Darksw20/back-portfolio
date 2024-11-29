@@ -14,6 +14,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 		"Authorization,X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version"
 	);
 
+	const { username, password } = JSON.parse(req.body);
+
 	if (req.method === "GET") {
 		// Handle GET requests
 		return res.json({
@@ -23,11 +25,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 		try {
 			// Properly parameterize the query
 			const result =
-				await sql`SELECT id,email FROM users WHERE username = ${req.body.username} AND password = ${req.body.password};`;
+				await sql`SELECT id,email FROM users WHERE username = ${username} AND password = ${password};`;
 
 			console.log(
 				"result",
-				`SELECT id,email FROM users WHERE username = ${req.body.username} AND password = ${req.body.password};`,
+				`SELECT id,email FROM users WHERE username = ${username} AND password = ${password};`,
 				result
 			);
 
