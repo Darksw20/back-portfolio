@@ -57,10 +57,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 			});
 		}
 	} else if (req.method === "POST") {
-		// Process a POST request
+		// Add new skill
+		const insertSkill = await sql`
+			INSERT INTO skills (name, type, percent, image)
+			VALUES (${req.body.name}, ${req.body.type}, ${req.body.percent}, 'cuervo.png')
+			RETURNING id;`;
 
 		return res.json({
-			message: `POST Hello ${name}!`,
+			message: `POST Hello ${insertSkill.rows[0].id}!`,
 		});
 	} else if (req.method === "PUT") {
 		// get dynamic skills data
