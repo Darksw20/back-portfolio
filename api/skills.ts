@@ -57,10 +57,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 			});
 		}
 	} else if (req.method === "POST") {
+		const { name, type, percent } = JSON.parse(req.body);
 		// Add new skill
 		const insertSkill = await sql`
 			INSERT INTO skills (name, type, percent, image)
-			VALUES (${req.body.name}, ${req.body.type}, ${req.body.percent}, 'cuervo.png')
+			VALUES (${name}, ${type}, ${percent}, 'cuervo.png')
 			RETURNING *;`;
 
 		return res.json(insertSkill.rows[0]);
