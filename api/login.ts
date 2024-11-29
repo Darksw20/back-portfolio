@@ -37,7 +37,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
 			return res
 				.status(userFound ? 200 : 400)
-				.json(userFound ? result.rows[0] : { message: "No user found" });
+				.json(
+					userFound
+						? { userId: result.rows[0].id }
+						: { message: "No user found" }
+				);
 		} catch (error) {
 			console.log("error", error);
 			return res.status(500).json({
