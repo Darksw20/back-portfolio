@@ -30,6 +30,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 		return res.json({
 			message: `POST Hello ${name}!`,
 		});
+	} else if (req.method === "PATCH") {
+		// Process a PATCH request
+		return res.json({
+			message: `PATCH Hello ${name}!`,
+		});
+	} else if (req.method === "DELETE") {
+		// Process a DELETE request
+		return res.json({
+			message: `DELETE Hello ${name}!`,
+		});
 	} else {
 		// Handle any other HTTP method
 		return res.json({
