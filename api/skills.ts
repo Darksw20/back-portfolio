@@ -61,11 +61,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 		const insertSkill = await sql`
 			INSERT INTO skills (name, type, percent, image)
 			VALUES (${req.body.name}, ${req.body.type}, ${req.body.percent}, 'cuervo.png')
-			RETURNING id;`;
+			RETURNING *;`;
 
-		return res.json({
-			message: `POST Hello ${insertSkill.rows[0].id}!`,
-		});
+		return res.json(insertSkill.rows[0]);
 	} else if (req.method === "PUT") {
 		// get dynamic skills data
 		const { user, editedFields } = req.body;
