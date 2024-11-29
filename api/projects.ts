@@ -8,7 +8,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 			const result = await sql`SELECT a.*
 				FROM users
 				INNER JOIN achievements a on users.id = a.user_id
-				WHERE users.username=${user};`;
+				WHERE users.username=${user?.toLowerCase()};`;
 			return res.status(200).json(result.rows);
 		} catch (error) {
 			return res.status(500).json({

@@ -11,7 +11,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 					INNER JOIN public.achievements a on u.id = a.user_id
 					INNER JOIN public.skill_achievements sa on a.id = sa.fk_achievement
 					INNER JOIN public.skills s on s.id = sa.fk_skill
-					WHERE username=${user};`;
+					WHERE username=${user?.toLowerCase()};`;
 
 			// Helper function to get unique values by 'name'
 			const getUniqueByName = (rows, type) => {

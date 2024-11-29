@@ -11,7 +11,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 				result = await sql`
 					SELECT id, email, username, summary, motivation, github, linkedin 
 					FROM users 
-					WHERE username = ${user};
+					WHERE username = ${user?.toLowerCase()};
 				`;
 			} else {
 				result = await sql`

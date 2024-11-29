@@ -25,11 +25,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 		try {
 			// Properly parameterize the query
 			const result =
-				await sql`SELECT id,email FROM users WHERE username = ${username} AND password = ${password};`;
+				await sql`SELECT id,email FROM users WHERE username = ${username?.toLowerCase()} AND password = ${password};`;
 
 			console.log(
 				"result",
-				`SELECT id,email FROM users WHERE username = ${username} AND password = ${password};`,
+				`SELECT id,email FROM users WHERE username = ${username?.toLowerCase()} AND password = ${password};`,
 				result
 			);
 

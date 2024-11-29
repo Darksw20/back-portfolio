@@ -29,7 +29,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 		try {
 			// Validate if the user already exists
 			const user = await sql`
-				SELECT id FROM users WHERE username = ${username};
+				SELECT id FROM users WHERE username = ${username?.toLowerCase()};
 			`;
 
 			if (user.rows.length > 0) {
@@ -47,7 +47,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
 			const result = await sql`
 				 INSERT INTO users (username, email, password)
-				 VALUES (${username}, ${email}, ${password})
+				 VALUES (${username?.toLowerCase()}, ${email?.toLowerCase()}, ${password})
 				 RETURNING id;
 			 `;
 

@@ -6,7 +6,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 	if (req.method === "GET") {
 		try {
 			const userResult =
-				await sql`SELECT id FROM users WHERE username = ${user}`;
+				await sql`SELECT id FROM users WHERE username = ${user?.toLowerCase()}`;
 
 			if (userResult.rows.length === 0) {
 				return res.status(404).json({

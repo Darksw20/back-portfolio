@@ -10,7 +10,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 INNER JOIN public.achievements a on u.id = a.user_id
                 INNER JOIN public.roles_achievements ra on a.id = ra.fk_achievement
                 INNER JOIN public.roles r on r.id = ra.fk_role
-                WHERE u.username=${user};`;
+                WHERE u.username=${user?.toLowerCase()};`;
 			return res.status(200).json(result.rows);
 		} catch (error) {
 			return res.status(500).json({
