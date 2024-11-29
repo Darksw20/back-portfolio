@@ -4,6 +4,17 @@ import { sql } from "@vercel/postgres";
 export default async function handler(req: VercelRequest, res: VercelResponse) {
 	const { user } = req.query as { user?: string };
 	if (req.method === "GET") {
+		if (!user) {
+			try {
+				const result = await sql`
+					SELECT * FROM skills;`;
+				return res.status(200).json(result.rows);
+			} catch (error) {
+				return res.status(500).json({
+					message: error,
+				});
+			}
+		}
 		try {
 			const result = await sql`
 				SELECT s.*,a.*,s.type as skill_type,a.type as achivement_type
@@ -47,8 +58,33 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 		}
 	} else if (req.method === "POST") {
 		// Process a POST request
+
 		return res.json({
 			message: `POST Hello ${name}!`,
+		});
+	} else if (req.method === "PUT") {
+		// get dynamic skills data
+		const { user, editedFields } = req.body;
+
+		// get user id
+		const responseUser = await sql`
+			SELECT id
+			FROM users
+			WHERE username = ${user.toLowerCase()};`;
+
+		const userId = responseUser.rows[0].id;
+
+		editedFields.forEach(async (field) => {
+			const { id, name, type, percent } = field;
+			const result = await sql`
+				UPDATE skills
+				SET name = ${name}, type = ${type}, percent = ${percent}, image = 'cuervo.png'
+				WHERE id = ${id};`;
+			console.log(result);
+		});
+
+		return res.json({
+			message: `PUT Hello ${userId}!`,
 		});
 	} else {
 		// Handle any other HTTP method
