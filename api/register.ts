@@ -18,12 +18,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 		return res.status(400).json({ message: "Missing required fields" });
 	}
 
-	const { username, email, password } = req.body;
-
-	console.log("username", username);
-	console.log("email", email);
-	console.log("password", password);
-
 	if (req.method === "GET") {
 		// Handle GET requests
 		return res.json({
@@ -33,7 +27,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 		try {
 			// Validate if the user already exists
 			const user = await sql`
-				SELECT id FROM users WHERE username = ${username};
+				SELECT id FROM users WHERE username = ${req.body.username};
 			`;
 
 			if (user.rows.length > 0) {
@@ -42,7 +36,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
 			// validate if the email already exists
 			const userEmail = await sql`
-				SELECT id FROM users WHERE email = ${email};
+				SELECT id FROM users WHERE email = ${req.body.email};
 			`;
 
 			if (userEmail.rows.length > 0) {
@@ -51,7 +45,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
 			const result = await sql`
 				 INSERT INTO users (username, email, password)
-				 VALUES (${username}, ${email}, ${password})
+				 VALUES (${req.body.username}, ${req.body.email}, ${req.body.password})
 				 RETURNING id;
 			 `;
 
