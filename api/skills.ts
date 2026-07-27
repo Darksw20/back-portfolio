@@ -25,7 +25,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 					WHERE username=${user?.toLowerCase()};`;
 
 			// Helper function to get unique values by 'name'
-			const getUniqueByName = (rows, type) => {
+			const getUniqueByName = (
+				rows: Array<{ skill_type: string; name: string }>,
+				type: string
+			) => {
 				const seen = new Set();
 				return rows.filter((row) => {
 					if (row.skill_type === type && !seen.has(row.name)) {
@@ -36,14 +39,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 				});
 			};
 
-			const softSkill = getUniqueByName(result.rows, "SOFT_SKILL");
-			const courses = getUniqueByName(result.rows, "COURSE");
-			const languages = getUniqueByName(result.rows, "LANGUAGE");
+			const skillRows = result.rows as Array<{ skill_type: string; name: string }>;
+			const softSkill = getUniqueByName(skillRows, "SOFT_SKILL");
+			const courses = getUniqueByName(skillRows, "COURSE");
+			const languages = getUniqueByName(skillRows, "LANGUAGE");
 			const programmingLanguages = getUniqueByName(
-				result.rows,
+				skillRows,
 				"PROGRAMMING_LANG"
 			);
-			const tools = getUniqueByName(result.rows, "TOOLS");
+			const tools = getUniqueByName(skillRows, "TOOLS");
 			return res.status(200).json({
 				softSkill,
 				courses,
@@ -77,7 +81,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
 		const userId = responseUser.rows[0].id;
 
-		editedFields.forEach(async (field) => {
+		editedFields.forEach(async (field: { id: number; name: string; type: string; percent: number }) => {
 			const { id, name, type, percent } = field;
 			const result = await sql`
 				UPDATE skills

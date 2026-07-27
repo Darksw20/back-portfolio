@@ -22,7 +22,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 			return res.status(200).json(result.rows);
 		} catch (error) {
 			return res.status(500).json({
-				message: error.message || "Internal Server Error",
+				message: error instanceof Error ? error.message : "Internal Server Error",
 			});
 		}
 	} else if (req.method === "POST") {
