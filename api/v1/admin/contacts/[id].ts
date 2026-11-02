@@ -1,0 +1,12 @@
+import type { VercelRequest, VercelResponse } from "@vercel/node";
+import { z } from "zod";
+import { requireAnyRole, requireAuthenticatedSession } from "../../../../lib/auth.js";
+import { getSql } from "../../../../lib/db.js";
+import { ApiError, enforceOrigin, getSingleQueryValue, handlePreflight, parseBody, requireMethod, sendError, sendJson } from "../../../../lib/http.js";
+const updateSchema = z.object({ status: z.enum(["approved", "rejected", "replied"]), note: z.string().trim().max(1_000).optional() });
+type ContactRow = { id: string | number; name: string; email: string; subject: string | null; message: string; status: string; created_at: string };
+function idValue(req: VercelRequest) { const id = getSingleQueryValue(req, "id"); if (!id || !/^\d+$/.test(id)) throw new ApiError(400, "invalid_contact_id", "The contact ID is invalid."); return id; }
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  if (handlePreflight(req, res) || !enforceOrigin(req, res) || !requireMethod(req, res, "GET", "PATCH")) return;
+  try { const session = await requireAuthenticatedSession(req); requireAnyRole(session, ["superuser", "editor"]); const id = idValue(req), sql = getSql(); if (req.method === "GET") { const contact = ((await sql`SELECT id, name, email, subject, message, status, created_at FROM contact_messages WHERE id = ${id} LIMIT 1`) as ContactRow[])[0]; if (!contact) throw new ApiError(404, "contact_not_found", "The contact message does not exist."); sendJson(res, 200, { contact: { id: String(contact.id), name: contact.name, email: contact.email, subject: contact.subject, message: contact.message, status: contact.status, createdAt: contact.created_at } }); return; } const input = parseBody(req, updateSchema); const contact = ((await sql`UPDATE contact_messages SET status = ${input.status}::contact_status WHERE id = ${id} RETURNING id, name, email, subject, message, status, created_at`) as ContactRow[])[0]; if (!contact) throw new ApiError(404, "contact_not_found", "The contact message does not exist."); await sql`INSERT INTO contact_events (contact_message_id, actor_user_id, event_type, details) VALUES (${id}, ${session.userId}, ${`status_${input.status}`}, ${JSON.stringify({ note: input.note ?? null })}::jsonb)`; sendJson(res, 200, { contact: { id: String(contact.id), status: contact.status } }); } catch (error) { sendError(res, error); }
+}
