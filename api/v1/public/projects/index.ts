@@ -69,6 +69,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const page = positiveInteger(getSingleQueryValue(req, "page"), 1, 10_000);
     const pageSize = positiveInteger(getSingleQueryValue(req, "pageSize"), 12, 48);
     const query = (getSingleQueryValue(req, "query") ?? "").trim().slice(0, 100);
+    const area = (getSingleQueryValue(req, "area") ?? "").trim().toLowerCase();
+    if (area && !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(area)) throw new ApiError(400, "invalid_area", "The development area is invalid.");
     const tag = (getSingleQueryValue(req, "tag") ?? "").trim().toLowerCase().slice(0, 96);
     const from = parseOptionalDate(getSingleQueryValue(req, "from"), "from");
     const to = parseOptionalDate(getSingleQueryValue(req, "to"), "to");
@@ -84,7 +86,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         translation.summary,
         project.start_date,
         project.end_date,
-        primary_media.blob_url AS primary_image_url,
+        COALESCE(project.cover_image_url, primary_media.blob_url) AS primary_image_url,
         COALESCE((
           SELECT jsonb_agg(jsonb_build_object('slug', tag_row.slug, 'name', tag_row.name) ORDER BY tag_row.name)
           FROM project_tags project_tag
@@ -100,6 +102,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       LEFT JOIN media_assets primary_media ON primary_media.id = primary_link.media_asset_id
       WHERE project.status = 'published'
         AND (${query} = '' OR translation.title ILIKE '%' || ${query} || '%' OR translation.summary ILIKE '%' || ${query} || '%')
+        AND (${area} = '' OR EXISTS (SELECT 1 FROM jsonb_array_elements(project.development_areas) AS area_item WHERE area_item->>'slug' = ${area}))
         AND (${tag} = '' OR EXISTS (
           SELECT 1
           FROM project_tags filter_link

@@ -6,7 +6,10 @@
   "private": true,
   "scripts": {
     "migrate": "tsx scripts/migrate.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "dev": "node --watch --env-file-if-exists=.env.local --env-file-if-exists=.env.development.local --import tsx scripts/dev-server.ts",
+    "seed": "tsx scripts/seed.ts",
+    "test:session": "node --env-file-if-exists=.env.local --env-file-if-exists=.env.development.local --import tsx scripts/session-smoke.ts"
   },
   "devDependencies": {
     "@types/node": "^22.20.1",
@@ -18,8 +21,12 @@
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",
-    "@vercel/postgres": "^0.9.0",
+    "@vercel/blob": "^2.8.2",
     "jose": "^6.2.4",
+    "simple-icons": "16.36.0",
     "zod": "^4.4.3"
+  },
+  "engines": {
+    "node": "24.x"
   }
 }

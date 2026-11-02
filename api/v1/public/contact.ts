@@ -17,7 +17,7 @@ const contactInputSchema = z.object({
   email: z.string().trim().toLowerCase().email().max(320),
   subject: z.string().trim().max(255).optional(),
   message: z.string().trim().min(10).max(10_000),
-  website: z.string().max(0).optional(),
+  website: z.string().max(2048).optional(),
 });
 
 type RecentSubmissionCount = { count: string | number };

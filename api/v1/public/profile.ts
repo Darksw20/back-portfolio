@@ -9,6 +9,7 @@ type ProfileRow = {
   display_name: string;
   headline: string;
   biography: string;
+  work_history: string;
   photo_url: string | null;
 };
 
@@ -26,7 +27,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const locale = getLocale(req);
     const sql = getSql();
     const profiles = (await sql`
-      SELECT p.id, pt.locale, pt.display_name, pt.headline, pt.biography, media.blob_url AS photo_url
+      SELECT p.id, pt.locale, pt.display_name, pt.headline, pt.biography, pt.work_history, COALESCE(p.photo_url, media.blob_url) AS photo_url
       FROM profiles p
       INNER JOIN profile_translations pt ON pt.profile_id = p.id AND pt.locale = ${locale}
       LEFT JOIN media_assets media ON media.id = p.photo_media_id
@@ -49,6 +50,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       displayName: profile.display_name,
       headline: profile.headline,
       biography: profile.biography,
+      workHistory: profile.work_history,
       photoUrl: profile.photo_url,
       socialLinks: socialLinks.map((link) => ({ platform: link.platform, url: link.url })),
     });

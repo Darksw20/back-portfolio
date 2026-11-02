@@ -48,7 +48,7 @@ export function handlePreflight(req: VercelRequest, res: VercelResponse): boolea
     return true;
   }
 
-  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PATCH,DELETE,OPTIONS");
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type,X-Setup-Secret,X-CSRF-Token");
   res.status(204).end();
   return true;

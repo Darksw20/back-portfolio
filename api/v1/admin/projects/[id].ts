@@ -2,6 +2,7 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { z } from "zod";
 import { requireAnyRole, requireAuthenticatedSession } from "../../../../lib/auth.js";
 import { getSql } from "../../../../lib/db.js";
+import { skillIdsSchema } from "../../../../lib/experience.js";
 import {
   ApiError,
   enforceOrigin,
@@ -23,12 +24,28 @@ const translationSchema = z.object({
   description: z.string().trim().min(1).max(20_000),
 });
 
+const externalUrl = z.string().trim().max(2048).url().refine(value => /^https?:\/\//i.test(value));
+const imageUrl = z.string().trim().max(2048).refine(value => {
+  if (/^\/img\/[a-zA-Z0-9_.\/-]+$/.test(value) && !value.includes('..')) return true;
+  try { const parsed = new URL(value); return parsed.protocol === 'http:' || parsed.protocol === 'https:'; } catch { return false; }
+});
+const areaSchema = z.object({
+  slug: z.string().trim().min(1).max(96).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+  es: z.string().trim().min(1).max(96),
+  en: z.string().trim().min(1).max(96),
+});
 const updateProjectSchema = z.object({
+  developmentAreas: z.array(areaSchema).max(20).refine(areas => new Set(areas.map(area => area.slug)).size === areas.length).optional(),
+  githubUrl: externalUrl.nullable().optional(),
+  websiteUrl: externalUrl.nullable().optional(),
+  coverImageUrl: imageUrl.nullable().optional(),
+  galleryImageUrls: z.array(imageUrl).max(30).optional(),
   status: statusSchema.optional(),
   startDate: dateSchema.nullable().optional(),
   endDate: dateSchema.nullable().optional(),
   featuredOrder: z.number().int().nonnegative().nullable().optional(),
   translations: z.array(translationSchema).min(1).max(2).optional(),
+  skillIds: skillIdsSchema.optional(),
   tagIds: z.array(z.coerce.number().int().positive()).max(100).optional(),
   roleIds: z.array(z.coerce.number().int().positive()).max(100).optional(),
 }).refine((input) => Object.keys(input).length > 0, "At least one field is required.");
@@ -40,6 +57,7 @@ type ProjectRow = {
   end_date: string | null;
   featured_order: number | null;
   published_at: string | null;
+  github_url: string | null; website_url: string | null; cover_image_url: string | null; gallery_image_urls: string[]; development_areas: Array<{slug: string; es: string; en: string}>;
 };
 
 type TranslationRow = {
@@ -72,9 +90,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const sql = getSql();
 
     if (req.method === "GET") {
-      const [projectResults, translationResults] = await Promise.all([
+      const [projectResults, translationResults, skillResults] = await Promise.all([
         sql`
-          SELECT id, status, start_date, end_date, featured_order, published_at
+          SELECT id, status, start_date, end_date, featured_order, published_at, github_url, website_url, cover_image_url, gallery_image_urls, development_areas
           FROM projects
           WHERE id = ${projectId}
           LIMIT 1
@@ -85,6 +103,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           WHERE project_id = ${projectId}
           ORDER BY locale ASC
         `,
+        sql`SELECT skill_id::text AS id FROM project_skills WHERE project_id = ${projectId} ORDER BY skill_id`,
       ]);
       const projects = projectResults as ProjectRow[];
       const translations = translationResults as TranslationRow[];
@@ -95,6 +114,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         project: {
           id: String(project.id), status: project.status, startDate: project.start_date,
           endDate: project.end_date, featuredOrder: project.featured_order, publishedAt: project.published_at,
+          githubUrl: project.github_url, websiteUrl: project.website_url, coverImageUrl: project.cover_image_url, galleryImageUrls: project.gallery_image_urls, developmentAreas: project.development_areas,
+          skillIds: skillResults.map(item => String(item.id)),
           translations,
         },
       });
@@ -103,6 +124,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const input = parseBody(req, updateProjectSchema);
 
+    if (input.skillIds) {
+      const matches = await sql`SELECT count(*)::int AS count FROM skills WHERE id IN (SELECT value::bigint FROM jsonb_array_elements_text(${JSON.stringify(input.skillIds)}::jsonb))`;
+      if (Number(matches[0]?.count) !== input.skillIds.length) throw new ApiError(400, "invalid_skill_id", "One or more skills do not exist.");
+    }
     if (input.translations) {
       const locales = input.translations.map((translation) => translation.locale);
       if (new Set(locales).size !== locales.length) {
@@ -147,6 +172,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const projects = (await sql`
       UPDATE projects
       SET
+        development_areas = CASE WHEN ${Object.hasOwn(input, "developmentAreas")} THEN ${JSON.stringify(input.developmentAreas ?? [])}::jsonb ELSE development_areas END,
+        github_url = CASE WHEN ${Object.hasOwn(input, "githubUrl")} THEN ${input.githubUrl ?? null} ELSE github_url END,
+        website_url = CASE WHEN ${Object.hasOwn(input, "websiteUrl")} THEN ${input.websiteUrl ?? null} ELSE website_url END,
+        cover_image_url = CASE WHEN ${Object.hasOwn(input, "coverImageUrl")} THEN ${input.coverImageUrl ?? null} ELSE cover_image_url END,
+        gallery_image_urls = CASE WHEN ${Object.hasOwn(input, "galleryImageUrls")} THEN ${JSON.stringify(input.galleryImageUrls ?? [])}::jsonb ELSE gallery_image_urls END,
         status = COALESCE(${input.status ?? null}::content_status, status),
         start_date = CASE WHEN ${hasStartDate} THEN ${input.startDate ?? null}::date ELSE start_date END,
         end_date = CASE WHEN ${hasEndDate} THEN ${input.endDate ?? null}::date ELSE end_date END,
@@ -162,6 +192,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const project = projects[0];
     if (!project) throw new ApiError(404, "project_not_found", "The requested project does not exist.");
 
+    if (input.skillIds) {
+      await sql.transaction([
+        sql`DELETE FROM project_skills WHERE project_id = ${projectId}`,
+        sql`INSERT INTO project_skills (project_id, skill_id) SELECT ${projectId}, value::bigint FROM jsonb_array_elements_text(${JSON.stringify(input.skillIds)}::jsonb)`
+      ]);
+    }
     if (Object.hasOwn(input, "tagIds")) {
       await sql`DELETE FROM project_tags WHERE project_id = ${projectId}`;
       for (const tagId of input.tagIds ?? []) {

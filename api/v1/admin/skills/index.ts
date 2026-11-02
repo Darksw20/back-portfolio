@@ -2,6 +2,7 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { z } from "zod";
 import { requireAnyRole, requireAuthenticatedSession } from "../../../../lib/auth.js";
 import { getSql } from "../../../../lib/db.js";
+import { developmentAreasSchema, skillIconSchema } from "../../../../lib/skill-presentation.js";
 import { ApiError, enforceOrigin, getSingleQueryValue, handlePreflight, parseBody, requireMethod, sendError, sendJson } from "../../../../lib/http.js";
 
 const statusSchema = z.enum(["draft", "published", "archived"]);
@@ -14,8 +15,10 @@ const translationSchema = z.object({
 
 const createSkillSchema = z.object({
   status: statusSchema.default("draft"),
+  iconUrl: skillIconSchema.nullable().optional(),
+  developmentAreas: developmentAreasSchema.default([]),
   group: groupSchema,
-  proficiency: z.number().int().min(0).max(100),
+  proficiency: z.number().int().min(0).max(100).nullable(),
   displayOrder: z.number().int().nonnegative().default(0),
   translations: z.array(translationSchema).min(1).max(2),
 }).superRefine((skill, context) => {
@@ -32,9 +35,10 @@ type SkillListRow = {
   id: string | number;
   status: "draft" | "published" | "archived";
   group_name: string;
-  proficiency: number;
+  proficiency: number | null;
   display_order: number;
   name: string | null;
+  development_areas: Array<{slug:string;es:string;en:string}>;
   total_items: string | number;
 };
 
@@ -68,7 +72,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const query = (getSingleQueryValue(req, "query") ?? "").trim().slice(0, 100);
       const offset = (page - 1) * pageSize;
       const skills = (await sql`
-        SELECT skill.id, skill.status, skill.group_name, skill.proficiency, skill.display_order,
+        SELECT skill.id, skill.status, skill.group_name, skill.proficiency, skill.display_order, skill.development_areas,
           translation.name, count(*) OVER() AS total_items
         FROM skills skill
         LEFT JOIN skill_translations translation ON translation.skill_id = skill.id AND translation.locale = 'es-MX'
@@ -80,7 +84,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       `) as SkillListRow[];
       const totalItems = skills.length ? Number(skills[0].total_items) : 0;
       sendJson(res, 200, {
-        items: skills.map((skill) => ({ id: String(skill.id), status: skill.status, group: skill.group_name, proficiency: skill.proficiency, displayOrder: skill.display_order, name: skill.name })),
+        items: skills.map((skill) => ({ id: String(skill.id), status: skill.status, group: skill.group_name, proficiency: skill.proficiency, displayOrder: skill.display_order, name: skill.name, developmentAreas: skill.development_areas })),
         page: { number: page, pageSize, totalItems, totalPages: Math.ceil(totalItems / pageSize) },
       });
       return;
@@ -89,8 +93,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const input = parseBody(req, createSkillSchema);
     const skills = (await sql`
       WITH new_skill AS (
-        INSERT INTO skills (status, group_name, proficiency, display_order, published_at)
-        VALUES (${input.status}::content_status, ${input.group}::skill_group, ${input.proficiency}, ${input.displayOrder}, CASE WHEN ${input.status}::content_status = 'published' THEN now() ELSE NULL END)
+        INSERT INTO skills (status, group_name, proficiency, display_order, published_at, icon_url, development_areas)
+        VALUES (${input.status}::content_status, ${input.group}::skill_group, ${input.proficiency}, ${input.displayOrder}, CASE WHEN ${input.status}::content_status = 'published' THEN now() ELSE NULL END, ${input.iconUrl ?? null}, ${JSON.stringify(input.developmentAreas)}::jsonb)
         RETURNING id, status, group_name, proficiency, display_order, published_at
       ), new_translations AS (
         INSERT INTO skill_translations (skill_id, locale, name, description)

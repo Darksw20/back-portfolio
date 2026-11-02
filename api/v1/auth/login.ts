@@ -42,7 +42,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         u.username,
         u.password_hash,
         u.is_active,
-        COALESCE(array_agg(ur.role) FILTER (WHERE ur.role IS NOT NULL), '{}') AS roles
+        COALESCE(array_agg(ur.role::text) FILTER (WHERE ur.role IS NOT NULL), '{}'::text[]) AS roles
       FROM users u
       LEFT JOIN user_roles ur ON ur.user_id = u.id
       WHERE u.username = ${input.username}

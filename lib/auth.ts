@@ -38,7 +38,7 @@ export async function requireAuthenticatedSession(req: VercelRequest): Promise<A
       s.id,
       s.user_id,
       u.username,
-      COALESCE(array_agg(ur.role) FILTER (WHERE ur.role IS NOT NULL), '{}') AS roles
+      COALESCE(array_agg(ur.role::text) FILTER (WHERE ur.role IS NOT NULL), '{}'::text[]) AS roles
     FROM sessions s
     INNER JOIN users u ON u.id = s.user_id
     LEFT JOIN user_roles ur ON ur.user_id = u.id

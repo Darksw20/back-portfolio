@@ -2,6 +2,7 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { z } from "zod";
 import { requireAnyRole, requireAuthenticatedSession } from "../../../../lib/auth.js";
 import { getSql } from "../../../../lib/db.js";
+import { skillIdsSchema } from "../../../../lib/experience.js";
 import {
   ApiError,
   enforceOrigin,
@@ -25,6 +26,7 @@ const translationSchema = z.object({
 
 const createProjectSchema = z.object({
   status: statusSchema.default("draft"),
+  skillIds: skillIdsSchema.default([]),
   startDate: dateSchema.nullable().optional(),
   endDate: dateSchema.nullable().optional(),
   featuredOrder: z.number().int().nonnegative().nullable().optional(),
@@ -104,6 +106,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const input = parseBody(req, createProjectSchema);
+    const matches = await sql`SELECT count(*)::int AS count FROM skills WHERE id IN (SELECT value::bigint FROM jsonb_array_elements_text(${JSON.stringify(input.skillIds)}::jsonb))`;
+    if (Number(matches[0]?.count) !== input.skillIds.length) throw new ApiError(400, "invalid_skill_id", "One or more skills do not exist.");
     const projects = (await sql`
       WITH new_project AS (
         INSERT INTO projects (status, start_date, end_date, featured_order, published_at)
@@ -121,6 +125,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         FROM new_project project
         CROSS JOIN jsonb_to_recordset(${JSON.stringify(input.translations)}::jsonb)
           AS translation(locale varchar(10), slug varchar(128), title varchar(180), summary varchar(400), description text)
+      ), new_skills AS (
+        INSERT INTO project_skills(project_id, skill_id)
+        SELECT project.id, value::bigint FROM new_project project CROSS JOIN jsonb_array_elements_text(${JSON.stringify(input.skillIds)}::jsonb)
       )
       SELECT id, status, start_date, end_date, published_at FROM new_project
     `) as Array<Omit<ProjectListRow, "title" | "slug" | "total_items">>;

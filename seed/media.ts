@@ -1,0 +1,26 @@
+// Public URLs of the imported seed images in Vercel Blob.
+export const seedMedia: Record<string, string> = {
+  "/img/Diseños-16.png": "https://am2meherpnpr63cw.public.blob.vercel-storage.com/portfolio/imported/537bf56e1a7e87f5-Disenos-16.png",
+  "/img/Dise%C3%B1os-16.png": "https://am2meherpnpr63cw.public.blob.vercel-storage.com/portfolio/imported/537bf56e1a7e87f5-Disenos-16.png",
+  "/img/Diseños-17.png": "https://am2meherpnpr63cw.public.blob.vercel-storage.com/portfolio/imported/bceeb345b6977fd0-Disenos-17.png",
+  "/img/Dise%C3%B1os-17.png": "https://am2meherpnpr63cw.public.blob.vercel-storage.com/portfolio/imported/bceeb345b6977fd0-Disenos-17.png",
+  "/img/Diseños-18.png": "https://am2meherpnpr63cw.public.blob.vercel-storage.com/portfolio/imported/00a2ef710be4d64c-Disenos-18.png",
+  "/img/Dise%C3%B1os-18.png": "https://am2meherpnpr63cw.public.blob.vercel-storage.com/portfolio/imported/00a2ef710be4d64c-Disenos-18.png",
+  "/img/Diseños-19.png": "https://am2meherpnpr63cw.public.blob.vercel-storage.com/portfolio/imported/e61f482116695517-Disenos-19.png",
+  "/img/Dise%C3%B1os-19.png": "https://am2meherpnpr63cw.public.blob.vercel-storage.com/portfolio/imported/e61f482116695517-Disenos-19.png",
+  "/img/Huaro.JPG": "https://am2meherpnpr63cw.public.blob.vercel-storage.com/portfolio/imported/2f73631dee8a318b-Huaro.JPG",
+  "/img/HuaroM.png": "https://am2meherpnpr63cw.public.blob.vercel-storage.com/portfolio/imported/8b0487fe2a7c4ada-HuaroM.png",
+  "/img/cuervo.png": "https://am2meherpnpr63cw.public.blob.vercel-storage.com/portfolio/imported/749251dfe93238e4-cuervo.png",
+  "/img/favicon.png": "https://am2meherpnpr63cw.public.blob.vercel-storage.com/portfolio/imported/3f8b4c849cd19b2d-favicon.png",
+  "/img/github.png": "https://am2meherpnpr63cw.public.blob.vercel-storage.com/portfolio/imported/98a46602b0e66015-github.png",
+  "/img/linkedin.png": "https://am2meherpnpr63cw.public.blob.vercel-storage.com/portfolio/imported/7dcbc6147b5ba1f1-linkedin.png",
+  "/img/port-01.png": "https://am2meherpnpr63cw.public.blob.vercel-storage.com/portfolio/imported/9fdaa00bc351a48c-port-01.png",
+  "/img/port-02.png": "https://am2meherpnpr63cw.public.blob.vercel-storage.com/portfolio/imported/122230e16859be57-port-02.png",
+  "/img/port-03.png": "https://am2meherpnpr63cw.public.blob.vercel-storage.com/portfolio/imported/38adc4caecf57b70-port-03.png",
+  "/img/port-04.png": "https://am2meherpnpr63cw.public.blob.vercel-storage.com/portfolio/imported/a1e09fd764bab4c0-port-04.png",
+  "/img/skills/adaptabilidad.svg": "https://am2meherpnpr63cw.public.blob.vercel-storage.com/portfolio/imported/aa1db632cc50cf3d-skills-adaptabilidad.svg",
+  "/img/skills/amabilidad.svg": "https://am2meherpnpr63cw.public.blob.vercel-storage.com/portfolio/imported/6a0875eec931fe94-skills-amabilidad.svg",
+  "/img/skills/aprendizaje.svg": "https://am2meherpnpr63cw.public.blob.vercel-storage.com/portfolio/imported/6ea2c930c663182a-skills-aprendizaje.svg",
+  "/img/skills/innovacion.svg": "https://am2meherpnpr63cw.public.blob.vercel-storage.com/portfolio/imported/56bfc2039408d50e-skills-innovacion.svg",
+  "/img/yo-14.png": "https://am2meherpnpr63cw.public.blob.vercel-storage.com/portfolio/imported/1f12d8560aabc54c-yo-14.png"
+};
