@@ -5,6 +5,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Pool, neonConfig } from "@neondatabase/serverless";
 import WebSocket from "ws";
+import { getDatabaseUrl } from "../lib/env.js";
 
 neonConfig.webSocketConstructor = WebSocket;
 
@@ -36,10 +37,7 @@ async function migrate(): Promise<void> {
     process.loadEnvFile(localEnvironmentFile);
   }
 
-  const databaseUrl = process.env.DATABASE_URL;
-  if (!databaseUrl) {
-    throw new Error("DATABASE_URL is required to run migrations.");
-  }
+  const databaseUrl = getDatabaseUrl();
 
   const pool = new Pool({ connectionString: databaseUrl });
   const client = await pool.connect();

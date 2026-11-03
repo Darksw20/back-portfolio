@@ -13,7 +13,7 @@ export type RuntimeEnvironment = z.infer<typeof runtimeEnvironmentSchema>;
 
 export function getRuntimeEnvironment(): RuntimeEnvironment {
   return runtimeEnvironmentSchema.parse({
-    DATABASE_URL: process.env.DATABASE_URL,
+    DATABASE_URL: getDatabaseUrl(),
     SESSION_JWT_SECRET: process.env.SESSION_JWT_SECRET,
     INITIAL_SUPERUSER_SETUP_SECRET: process.env.INITIAL_SUPERUSER_SETUP_SECRET,
     ALLOWED_ORIGINS: process.env.ALLOWED_ORIGINS,
@@ -21,7 +21,7 @@ export function getRuntimeEnvironment(): RuntimeEnvironment {
 }
 
 export function getDatabaseUrl(): string {
-  return z.string().url().parse(process.env.DATABASE_URL);
+  return z.string().url().parse(process.env.DATABASE_URL || process.env.PORTFOLIO_DATABASE_URL_UNPOOLED);
 }
 
 export function getSessionJwtSecret(): string {
