@@ -32,3 +32,9 @@ test('preflight continues to enforce origin and preserve CORS headers', async ()
   assert.equal(res.statusCode,204);
   assert.equal(res.headers['Access-Control-Allow-Origin'],'http://localhost:8080');
 });
+test('resume routes require an authenticated session', async () => {
+  for (const path of ['admin/resumes','admin/resumes/source','admin/resumes/123']) {
+    const {res} = await call(`/api/v1/${path}`,{__portfolio_route:path});
+    assert.equal(res.statusCode,401,path);
+  }
+});
