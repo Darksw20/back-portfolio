@@ -23,6 +23,8 @@ import adminSkills from "./v1/admin/skills/index.js";
 import adminSkill from "./v1/admin/skills/[id].js";
 import adminLearning from "./v1/admin/learning/index.js";
 import adminLearningEntry from "./v1/admin/learning/[id].js";
+import adminResumes from "./v1/admin/resumes/index.js";
+import resumeSource from "./v1/admin/resumes/source.js";
 import adminContacts from "./v1/admin/contacts/index.js";
 import adminContact from "./v1/admin/contacts/[id].js";
 
@@ -30,6 +32,7 @@ type Handler = (req: VercelRequest, res: VercelResponse) => Promise<void>;
 const routes: Array<[RegExp, Handler, string?]> = [
   [/^\/v1\/auth\/setup\/?$/, authSetup], [/^\/v1\/auth\/login\/?$/, authLogin], [/^\/v1\/auth\/session\/?$/, authSession], [/^\/v1\/auth\/logout\/?$/, authLogout],
   [/^\/v1\/public\/experiences\/?$/, publicExperiences], [/^\/v1\/public\/experiences\/([^/]+)\/?$/, publicExperience, "slug"], [/^\/v1\/public\/profile\/?$/, publicProfile], [/^\/v1\/public\/skills\/?$/, publicSkills], [/^\/v1\/public\/learning\/?$/, publicLearning], [/^\/v1\/public\/project-areas\/?$/, publicProjectAreas], [/^\/v1\/public\/projects\/?$/, publicProjects], [/^\/v1\/public\/projects\/([^/]+)\/?$/, publicProject, "slug"], [/^\/v1\/public\/contact\/?$/, publicContact],
+  [/^\/v1\/admin\/resumes\/source\/?$/, resumeSource], [/^\/v1\/admin\/resumes\/?$/, adminResumes], [/^\/v1\/admin\/resumes\/([^/]+)\/?$/, adminResumes, "id"],
   [/^\/v1\/admin\/skill-icons\/?$/, skillIcons], [/^\/v1\/admin\/image-upload\/?$/, imageUpload], [/^\/v1\/admin\/experiences\/?$/, adminExperiences], [/^\/v1\/admin\/experiences\/([^/]+)\/?$/, adminExperience, "id"], [/^\/v1\/admin\/profile\/?$/, adminProfile], [/^\/v1\/admin\/projects\/?$/, adminProjects], [/^\/v1\/admin\/projects\/([^/]+)\/?$/, adminProject, "id"], [/^\/v1\/admin\/skills\/?$/, adminSkills], [/^\/v1\/admin\/skills\/([^/]+)\/?$/, adminSkill, "id"], [/^\/v1\/admin\/learning\/?$/, adminLearning], [/^\/v1\/admin\/learning\/([^/]+)\/?$/, adminLearningEntry, "id"], [/^\/v1\/admin\/contacts\/?$/, adminContacts], [/^\/v1\/admin\/contacts\/([^/]+)\/?$/, adminContact, "id"],
 ];
 
