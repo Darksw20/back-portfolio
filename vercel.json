@@ -1,6 +1,13 @@
 {
+  "outputDirectory": "public",
   "rewrites": [
-    { "source": "/v1/:__portfolio_route(.*)", "destination": "/api/router?__portfolio_route=:__portfolio_route" },
-    { "source": "/api/v1/:__portfolio_route(.*)", "destination": "/api/router?__portfolio_route=:__portfolio_route" }
+    {
+      "source": "/v1/:__portfolio_route(.*)",
+      "destination": "/api/router?__portfolio_route=:__portfolio_route"
+    },
+    {
+      "source": "/api/v1/:__portfolio_route(.*)",
+      "destination": "/api/router?__portfolio_route=:__portfolio_route"
+    }
   ]
 }

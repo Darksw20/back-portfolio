@@ -10,7 +10,8 @@
     "dev": "node --watch --env-file-if-exists=.env.local --env-file-if-exists=.env.development.local --import tsx scripts/dev-server.ts",
     "seed": "tsx scripts/seed.ts",
     "test:session": "node --env-file-if-exists=.env.local --env-file-if-exists=.env.development.local --import tsx scripts/session-smoke.ts",
-    "test:router": "node --import tsx --test tests/router.test.mjs"
+    "test:router": "node --import tsx --test tests/router.test.mjs",
+    "verify:vercel-output": "node scripts/verify-vercel-output.mjs"
   },
   "devDependencies": {
     "@types/node": "^22.20.1",
